@@ -30,9 +30,9 @@ class FrameworkLoader:
         with open(framework_path, 'r', encoding='utf-8') as f:
             framework = yaml.safe_load(f)
 
-        print(f"✓ 加载框架: {framework['description']}")
-        print(f"  版本: {framework['framework_version']}")
-        print(f"  类别数: {len(framework['categories'])}")
+        print(f"[OK] Loading framework: {framework['description']}")
+        print(f"  Version: {framework['framework_version']}")
+        print(f"  Categories: {len(framework['categories'])}")
 
         return framework
 
@@ -105,7 +105,7 @@ class FrameworkLoader:
 
                 # 如果条件满足，应用then规则
                 if conditions_met and 'then' in rule:
-                    print(f"✓ 应用依赖规则: {rule.get('name', '未命名')}")
+                    print(f"[OK] Applying dependency rule: {rule.get('name', 'unnamed')}")
 
                     for then_field, then_value in rule['then'].items():
                         category, field = then_field.split('.')
@@ -217,17 +217,17 @@ class FrameworkDrivenGenerator:
         complete_intent = FrameworkLoader.apply_dependencies(intent, self.framework)
 
         # 步骤2：验证intent
-        print("\n✓ 步骤2：验证Intent")
+        print("\n[OK] 步骤2：验证Intent")
         print("-"*80)
 
         validation_issues = FrameworkLoader.validate_intent(complete_intent, self.framework)
 
         if validation_issues:
-            print(f"⚠️ 发现 {len(validation_issues)} 个验证问题:")
+            print(f"[Warning] 发现 {len(validation_issues)} 个验证问题:")
             for issue in validation_issues:
                 print(f"  - [{issue['severity']}] {issue['message']}")
         else:
-            print("✓ Intent验证通过")
+            print("[OK] Intent验证通过")
 
         # 步骤3：根据框架查询数据库
         print("\n🔍 步骤3：根据框架查询数据库")
@@ -235,22 +235,22 @@ class FrameworkDrivenGenerator:
 
         elements = self.query_by_framework(complete_intent)
 
-        print(f"✓ 查询到 {len(elements)} 个元素")
+        print(f"[OK] 查询到 {len(elements)} 个元素")
 
         # 步骤4：一致性检查
-        print("\n✓ 步骤4：一致性检查")
+        print("\n[OK] 步骤4：一致性检查")
         print("-"*80)
 
         consistency_issues = self.generator.check_consistency(elements)
 
         fixes_applied = []
         if consistency_issues:
-            print(f"⚠️ 发现 {len(consistency_issues)} 个一致性问题")
+            print(f"[Warning] 发现 {len(consistency_issues)} 个一致性问题")
             elements, fixes_applied = self.generator.resolve_conflicts(elements, consistency_issues)
             for fix in fixes_applied:
                 print(f"  {fix}")
         else:
-            print("✓ 没有发现一致性问题")
+            print("[OK] 没有发现一致性问题")
 
         # 步骤5：生成提示词
         print("\n✨ 步骤5：生成最终提示词")
@@ -265,11 +265,11 @@ class FrameworkDrivenGenerator:
         completeness_issues = self.generator.check_completeness(complete_intent, prompt)
 
         if completeness_issues:
-            print(f"⚠️ 发现 {len(completeness_issues)} 个缺失的需求:")
+            print(f"[Warning] 发现 {len(completeness_issues)} 个缺失的需求:")
             for item in completeness_issues:
                 print(f"  - {item['description']}")
         else:
-            print("✓ 提示词满足所有用户要求")
+            print("[OK] 提示词满足所有用户要求")
 
         return {
             'intent': complete_intent,
@@ -321,7 +321,7 @@ class FrameworkDrivenGenerator:
 
                     if all_elements:
                         candidates[field_key] = all_elements
-                        print(f"✓ {field_key}: 查询到 {len(all_elements)} 个候选元素")
+                        print(f"[OK] {field_key}: 查询到 {len(all_elements)} 个候选元素")
 
         # 查询subject相关的候选
         subject = intent.get('subject', {})
@@ -331,13 +331,13 @@ class FrameworkDrivenGenerator:
             eye_candidates = self.generator.get_all_elements_by_category('portrait', 'eye_types')
             if eye_candidates:
                 candidates['facial.eyes'] = eye_candidates
-                print(f"✓ facial.eyes: 查询到 {len(eye_candidates)} 个候选元素")
+                print(f"[OK] facial.eyes: 查询到 {len(eye_candidates)} 个候选元素")
 
             # 发色候选
             hair_candidates = self.generator.get_all_elements_by_category('portrait', 'hair_colors')
             if hair_candidates:
                 candidates['styling.hair_color'] = hair_candidates
-                print(f"✓ styling.hair_color: 查询到 {len(hair_candidates)} 个候选元素")
+                print(f"[OK] styling.hair_color: 查询到 {len(hair_candidates)} 个候选元素")
 
         return candidates
 
@@ -417,12 +417,12 @@ class FrameworkDrivenGenerator:
                     for kw in keywords:
                         elem = self.generator.get_element_by_category('portrait', db_category, kw)
                         if elem:
-                            print(f"✓ {category_name}.{field_name} = '{field_value}' → 找到: '{elem['chinese_name']}'（关键词: {kw}）")
+                            print(f"[OK] {category_name}.{field_name} = '{field_value}' → 找到: '{elem['chinese_name']}'（关键词: {kw}）")
                             elements.append(elem)
                             break
 
                     if not elem:
-                        print(f"⚠️ {category_name}.{field_name} = '{field_value}' → 未找到元素")
+                        print(f"[Warning] {category_name}.{field_name} = '{field_value}' → 未找到元素")
 
         # 3. 处理其他固定类别
         for attr in ['skin_tones', 'skin_textures', 'face_shapes', 'expressions', 'poses']:
@@ -671,7 +671,7 @@ class ElementSelector:
                 best_element = elem
 
         if debug and best_element:
-            print(f"✅ 最佳选择：{best_element.get('chinese_name', best_element.get('name'))}")
+            print(f"[OK] 最佳选择：{best_element.get('chinese_name', best_element.get('name'))}")
             print(f"   得分：{best_score:.1f}")
             print(f"{'='*80}\n")
 

@@ -245,13 +245,13 @@ class IntelligentGenerator:
             for kw in search_keywords:
                 clothing_elem = self.get_element_by_category('portrait', 'clothing_styles', kw)
                 if clothing_elem:
-                    print(f"✓ 找到服装元素: '{clothing_elem['chinese_name']}'（搜索关键词: {kw}）")
+                    print(f"[OK] 找到服装元素: '{clothing_elem['chinese_name']}'（搜索关键词: {kw}）")
                     elements.append(clothing_elem)
                     break
 
             # 如果没找到，记录信息
             if not clothing_elem:
-                print(f"⚠️ 未找到'{clothing}'服装元素，将通过风格关键词搜索")
+                print(f"[Warning] 未找到'{clothing}'服装元素，将通过风格关键词搜索")
         else:
             # 默认选择一个现代服装
             elem = self.get_element_by_category('portrait', 'clothing_styles')
@@ -272,13 +272,13 @@ class IntelligentGenerator:
             for kw in search_keywords:
                 hair_style_elem = self.get_element_by_category('portrait', 'hair_styles', kw)
                 if hair_style_elem:
-                    print(f"✓ 找到发型元素: '{hair_style_elem['chinese_name']}'（搜索关键词: {kw}）")
+                    print(f"[OK] 找到发型元素: '{hair_style_elem['chinese_name']}'（搜索关键词: {kw}）")
                     elements.append(hair_style_elem)
                     break
 
             # 如果没找到，记录信息
             if not hair_style_elem:
-                print(f"⚠️ 未找到'{hairstyle}'发型元素，将通过风格关键词搜索")
+                print(f"[Warning] 未找到'{hairstyle}'发型元素，将通过风格关键词搜索")
         else:
             # 默认选择一个现代发型
             elem = self.get_element_by_category('portrait', 'hair_styles')
@@ -305,13 +305,13 @@ class IntelligentGenerator:
         if clothing != 'modern':
             clothing_search_kws = clothing_keywords_map.get(clothing, [])
             style_keywords.extend(clothing_search_kws)
-            print(f"✓ 添加服装搜索关键词: {', '.join(clothing_search_kws)}")
+            print(f"[OK] 添加服装搜索关键词: {', '.join(clothing_search_kws)}")
 
         # 添加发型关键词（补充搜索）
         if hairstyle != 'modern':
             hairstyle_search_kws = hairstyle_keywords_map.get(hairstyle, [])
             style_keywords.extend(hairstyle_search_kws)
-            print(f"✓ 添加发型搜索关键词: {', '.join(hairstyle_search_kws)}")
+            print(f"[OK] 添加发型搜索关键词: {', '.join(hairstyle_search_kws)}")
 
         # 添加艺术风格
         if 'art_style' in visual_style:
@@ -339,7 +339,7 @@ class IntelligentGenerator:
             if director_style in self.knowledge.get('director_lighting_styles', {}):
                 lighting_config = self.knowledge['director_lighting_styles'][director_style]
                 style_keywords.extend(lighting_config['lighting_keywords'])
-                print(f"✓ 识别到'{lighting_config['description']}'，自动添加光影关键词: {', '.join(lighting_config['lighting_keywords'])}")
+                print(f"[OK] 识别到'{lighting_config['description']}'，自动添加光影关键词: {', '.join(lighting_config['lighting_keywords'])}")
 
             # 添加导演风格的特定关键词
             director_keywords = {
@@ -349,7 +349,7 @@ class IntelligentGenerator:
             }
             if director_style in director_keywords:
                 style_keywords.extend(director_keywords[director_style])
-                print(f"✓ 识别到导演风格'{director_style}'，添加特征关键词: {', '.join(director_keywords[director_style])}")
+                print(f"[OK] 识别到导演风格'{director_style}'，添加特征关键词: {', '.join(director_keywords[director_style])}")
 
         if style_keywords:
             style_elements = self.search_style_elements(style_keywords)
@@ -675,7 +675,7 @@ class IntelligentGenerator:
                     fixed_elements.append(new_eye_elem)
 
                     fixes_applied.append(
-                        f"✓ 修正眼睛: '{issue['current_eye']}' → '{new_eye_elem['template']}' "
+                        f"[OK] 修正眼睛: '{issue['current_eye']}' → '{new_eye_elem['template']}' "
                         f"(符合{issue['current_ethnicity']}特征)"
                     )
 
@@ -689,7 +689,7 @@ class IntelligentGenerator:
                     fixed_elements.append(new_hair_elem)
 
                     fixes_applied.append(
-                        f"✓ 修正发色: '{issue['current_hair']}' → '{new_hair_elem['template']}' "
+                        f"[OK] 修正发色: '{issue['current_hair']}' → '{new_hair_elem['template']}' "
                         f"(符合{issue['current_ethnicity']}特征)"
                     )
 
@@ -707,7 +707,7 @@ class IntelligentGenerator:
                         new_list.append(elem)
 
                 fixed_elements = new_list
-                fixes_applied.append(f"✓ 移除重复的'{cat}'类别元素")
+                fixes_applied.append(f"[OK] 移除重复的'{cat}'类别元素")
 
         return fixed_elements, fixes_applied
 
@@ -903,7 +903,7 @@ def test_intelligent_generator():
         for fix in fixes:
             print(f"   {fix}")
     else:
-        print("   ✓ 没有发现问题")
+        print("   [OK] 没有发现问题")
         fixed_elements = elements
 
     print("\n4. 生成最终提示词...")
@@ -913,12 +913,12 @@ def test_intelligent_generator():
     print("\n5. 检查完整性...")
     missing = gen.check_completeness(intent, prompt)
     if missing:
-        print(f"   ⚠️ 发现 {len(missing)} 个缺失的需求:")
+        print(f"   [Warning] 发现 {len(missing)} 个缺失的需求:")
         for item in missing:
             print(f"   - {item['description']}")
             print(f"     {item['suggestion']}")
     else:
-        print("   ✓ 提示词满足所有用户要求")
+        print("   [OK] 提示词满足所有用户要求")
 
     gen.close()
 
@@ -1044,12 +1044,12 @@ def save_generated_prompt(prompt_text: str, user_intent: str,
                     ''', (element_id, quality_score, datetime.now()))
 
         conn.commit()
-        print(f"✅ Prompt已保存到数据库，ID: #{prompt_id}")
+        print(f"[OK] Prompt已保存到数据库，ID: #{prompt_id}")
         return prompt_id
 
     except Exception as e:
         conn.rollback()
-        print(f"❌ 保存Prompt失败: {e}")
+        print(f"[Error] 保存Prompt失败: {e}")
         raise
     finally:
         conn.close()
